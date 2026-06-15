@@ -1,0 +1,64 @@
+:root {
+  color-scheme: light;
+}
+
+body {
+  min-height: 100vh;
+  background: #f5f7fb;
+}
+
+.navbar {
+  background: #ffffff;
+}
+
+.card,
+.list-group-item {
+  border-color: #dee4ee;
+  border-radius: 8px;
+}
+
+.summary-card {
+  border-left: 4px solid #0d6efd;
+}
+
+.summary-value {
+  display: block;
+  font-size: 1.65rem;
+  line-height: 1.2;
+}
+
+.form-card .card-footer {
+  border-top-color: #edf0f4;
+}
+
+.filter-box {
+  min-width: 220px;
+}
+
+.alert-area {
+  position: sticky;
+  top: 1rem;
+  z-index: 1050;
+}
+
+.expense-note {
+  max-width: 28rem;
+}
+
+.action-buttons {
+  white-space: nowrap;
+}
+
+.empty-row {
+  height: 7rem;
+}
+
+@media (max-width: 575.98px) {
+  .summary-value {
+    font-size: 1.35rem;
+  }
+
+  .filter-box {
+    width: 100%;
+  }
+}
