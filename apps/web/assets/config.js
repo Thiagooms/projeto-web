@@ -1,3 +1,3 @@
 window.APP_CONFIG = {
-  apiBase: 'http://localhost:3000/api',
+  "apiBase": "http://localhost:3000/api"
 };
