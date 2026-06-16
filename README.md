@@ -126,6 +126,7 @@ no Fly.io.
 - [Banco, utils e rotas](./docs/BANCO_UTILS_ROTAS.md)
 - [Roteiro de apresentacao](./docs/APRESENTACAO_E_DEPLOY.md)
 - [Deploy com Vercel e Fly.io](./docs/DEPLOY_VERCEL_FLY.md)
+- [OpenAPI](web/docs/openapi.yaml)
 
 ## Estrutura principal
 

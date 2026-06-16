@@ -1,0 +1,467 @@
+openapi: 3.0.3
+info:
+  title: Controle de Despesas API
+  version: 1.0.0
+  description: API para cadastro de categorias, despesas e resumo financeiro.
+servers:
+  - url: http://localhost:3000/api
+    description: Ambiente local
+  - url: https://controle-despesas-api-projetoweb.fly.dev/api
+    description: Ambiente publicado
+tags:
+  - name: Health
+    description: Verificacao de disponibilidade da API
+  - name: Categorias
+    description: Operacoes de cadastro e manutencao de categorias
+  - name: Despesas
+    description: Operacoes de cadastro, consulta e manutencao de despesas
+  - name: Resumo
+    description: Totais consolidados das despesas
+paths:
+  /health:
+    get:
+      tags:
+        - Health
+      summary: Verifica se a API esta online
+      responses:
+        '200':
+          description: API disponivel
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Health'
+              examples:
+                ok:
+                  value:
+                    status: ok
+
+  /categorias:
+    get:
+      tags:
+        - Categorias
+      summary: Lista categorias
+      responses:
+        '200':
+          description: Lista de categorias
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Categoria'
+    post:
+      tags:
+        - Categorias
+      summary: Cria uma categoria
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoriaInput'
+            examples:
+              alimentacao:
+                value:
+                  nome: Alimentacao
+                  descricao: Gastos com comida
+      responses:
+        '201':
+          description: Categoria criada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Categoria'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /categorias/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      tags:
+        - Categorias
+      summary: Busca uma categoria por ID
+      responses:
+        '200':
+          description: Categoria encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Categoria'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+        - Categorias
+      summary: Atualiza uma categoria
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoriaInput'
+      responses:
+        '200':
+          description: Categoria atualizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Categoria'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+    delete:
+      tags:
+        - Categorias
+      summary: Remove uma categoria
+      description: Categorias com despesas vinculadas nao podem ser removidas.
+      responses:
+        '204':
+          description: Categoria removida
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+
+  /despesas:
+    get:
+      tags:
+        - Despesas
+      summary: Lista despesas
+      parameters:
+        - name: categoriaId
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+          description: Filtra despesas por categoria
+        - name: dataInicial
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+          description: Data inicial no formato YYYY-MM-DD
+        - name: dataFinal
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+          description: Data final no formato YYYY-MM-DD
+      responses:
+        '200':
+          description: Lista de despesas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Despesa'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+    post:
+      tags:
+        - Despesas
+      summary: Cria uma despesa
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DespesaInput'
+            examples:
+              almoco:
+                value:
+                  titulo: Almoco
+                  valor: 35.5
+                  data: '2026-06-15'
+                  observacao: Restaurante
+                  categoriaId: 1
+      responses:
+        '201':
+          description: Despesa criada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Despesa'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+
+  /despesas/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      tags:
+        - Despesas
+      summary: Busca uma despesa por ID
+      responses:
+        '200':
+          description: Despesa encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Despesa'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+        - Despesas
+      summary: Atualiza uma despesa
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DespesaInput'
+      responses:
+        '200':
+          description: Despesa atualizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Despesa'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+    delete:
+      tags:
+        - Despesas
+      summary: Remove uma despesa
+      responses:
+        '204':
+          description: Despesa removida
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /resumo:
+    get:
+      tags:
+        - Resumo
+      summary: Obtem resumo das despesas
+      responses:
+        '200':
+          description: Resumo consolidado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resumo'
+
+components:
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+      description: Identificador numerico do recurso
+
+  responses:
+    BadRequest:
+      description: Requisicao invalida
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Recurso nao encontrado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Conflict:
+      description: Conflito com dados existentes
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    UnprocessableEntity:
+      description: Regra de negocio impediu a operacao
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+  schemas:
+    Health:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          example: ok
+
+    Categoria:
+      type: object
+      required:
+        - id
+        - nome
+      properties:
+        id:
+          type: integer
+          example: 1
+        nome:
+          type: string
+          example: Alimentacao
+        descricao:
+          type: string
+          nullable: true
+          example: Gastos com comida
+
+    CategoriaInput:
+      type: object
+      required:
+        - nome
+      properties:
+        nome:
+          type: string
+          minLength: 1
+          example: Alimentacao
+        descricao:
+          type: string
+          nullable: true
+          example: Gastos com comida
+
+    Despesa:
+      type: object
+      required:
+        - id
+        - titulo
+        - valor
+        - data
+        - categoriaId
+        - categoriaNome
+      properties:
+        id:
+          type: integer
+          example: 1
+        titulo:
+          type: string
+          example: Almoco
+        valor:
+          type: number
+          format: float
+          minimum: 0.01
+          example: 35.5
+        data:
+          type: string
+          format: date
+          example: '2026-06-15'
+        observacao:
+          type: string
+          nullable: true
+          example: Restaurante
+        categoriaId:
+          type: integer
+          example: 1
+        categoriaNome:
+          type: string
+          example: Alimentacao
+
+    DespesaInput:
+      type: object
+      required:
+        - titulo
+        - valor
+        - data
+        - categoriaId
+      properties:
+        titulo:
+          type: string
+          minLength: 1
+          example: Almoco
+        valor:
+          type: number
+          format: float
+          minimum: 0.01
+          example: 35.5
+        data:
+          type: string
+          format: date
+          example: '2026-06-15'
+        observacao:
+          type: string
+          nullable: true
+          example: Restaurante
+        categoriaId:
+          type: integer
+          minimum: 1
+          example: 1
+
+    Resumo:
+      type: object
+      required:
+        - totalGeral
+        - quantidadeDespesas
+        - quantidadeCategorias
+        - totalPorCategoria
+      properties:
+        totalGeral:
+          type: number
+          format: float
+          example: 120.5
+        quantidadeDespesas:
+          type: integer
+          example: 4
+        quantidadeCategorias:
+          type: integer
+          example: 3
+        totalPorCategoria:
+          type: array
+          items:
+            $ref: '#/components/schemas/TotalPorCategoria'
+
+    TotalPorCategoria:
+      type: object
+      required:
+        - categoriaId
+        - categoriaNome
+        - quantidade
+        - total
+      properties:
+        categoriaId:
+          type: integer
+          example: 1
+        categoriaNome:
+          type: string
+          example: Alimentacao
+        quantidade:
+          type: integer
+          example: 2
+        total:
+          type: number
+          format: float
+          example: 80.5
+
+    Error:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          example: Recurso nao encontrado
+        details:
+          nullable: true
